@@ -58,6 +58,11 @@ QT_FORWARD_DECLARE_CLASS(QTextEdit)
 QT_FORWARD_DECLARE_CLASS(QTextCharFormat)
 QT_FORWARD_DECLARE_CLASS(QMenu)
 #define cout qDebug()
+#define MIN(a,b) a<b?a:b
+#define LINEHEIGHT 18
+#define LINECNT    45
+#define PAGEWIDTH  770
+//#define PAGEHEIGHT 825
 
 class TextEdit : public QMainWindow
 {

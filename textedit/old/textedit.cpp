@@ -77,35 +77,63 @@ void TextEdit::dividePages(){
   QString str="";
   int lineNum=0;
   int height=0;
+  int blockNum=0;
+  int lastLine=-1;
   int pageLn=0;
-  while(true){
+  while(lineNum<doc->lineCount()){
     cout<<"";
-    cout<<"block "<<block.blockNumber()<<"\tposx:"<<block.layout()->position().x()<<"\tposy:"<<block.layout()->position().y();
+    cout<<"block "<<blockNum<<"\tposx:"<<block.layout()->position().x()<<"\tposy:"<<block.layout()->position().y();
     cout<<block.text();
     int blockLength=block.text().length();
-    QTextLayout* layout=block.layout();
-    int lastLine=-1;
+    int blockRemains=blockLength;
     int pos=0;
-    int i=0;
-    for(;i<=blockLength;i++){
-      QTextLine layoutLine=layout->lineForTextPosition(i);
-      int lineNumber= layoutLine.lineNumber();
-      if(i==blockLength||lineNumber!=lastLine){//new line
-        lastLine++;
-        if(lineNum>=LINECNT){ //new page
-          cout<<"##############NEW PAGE#############";
-          str.append(block.text().mid(pos,i-pos));
-          docs.append(new QTextDocument(str));
-          str="";
-          lineNum=0;
-          pos=i;
-        }
-        else  {lineNum++;cout<<"line added:"<<lineNum;}
-        if(lineNum==blockLength) str.append(block.text().mid(pos,i-pos)+"\n");
-      }
+#define LINEHEIGHT 18
+#define LINELENGTH 50
+#define LINECNT    50
+#define PAGEWIDTH  770
+//#define PAGEHEIGHT 825
+#define MIN(a,b) a<b?a:b
+    while(pageLn+(blockRemains/LINELENGTH+1)>=LINECNT){
+      int length=MIN(blockRemains,(LINECNT-pageLn)*LINECNT);
+      str.append((block.text()).mid(pos,length));
+      docs.append(new QTextDocument(str));
+      pos+=length;
+      blockRemains-=length;
+      pageLn=0;
+      str="";
+      cout<<"##############NEW PAGE#############";
     }
-    if(blockLength<=0) lineNum++;
+    str.append(block.text().mid(pos,blockRemains)+"\n");
+    pageLn+=blockRemains/LINELENGTH+1;
+//    QRectF rect=block.layout()->boundingRect();
+//    cout<<rect.height();
+//    if(height>=700){
+//        docs.append(new QTextDocument(str));
+//        str="";
+//        height=0;
+//    }
+    //output the position of each line
+//    for(int i=0;i<block.lineCount();i++){
+//      QTextLine line=block.layout()->lineAt(i);
+//      //ignore handled or invalid lines
+////      if(!line.isValid()) continue;
+////      if(line.lineNumber()==lastLine) continue;
+//      lastLine=line.lineNumber();
+////      height+=line.height();
+////      if(lineNum>0&&lineNum%40==0){
+//////      if(height>700){
+////        docs.append(new QTextDocument(str));
+////        cout<<"##############NEW PAGE#############";
+////        height=0;
+////        str="";
+////      }
+//      int s=line.textStart(),t=line.textLength();
+//      cout<<"line "<<line.lineNumber()<<"\theight:"<<line.height()<<"\twidth:"<<line.width();//<<":"<<str.section(' ',s,s+t);
+//      cout<<"line "<<line.lineNumber()<<"\tstart:"<<s<<"\tlength:"<<t;//<<":"<<str.section(' ',s,s+ QVectort);
+//      lineNum++;
+//    }
     block=block.next();
+    blockNum++;
     if(!block.isValid()) break;
   }
   if(str!=""||docs.size()<=0) docs.append(new QTextDocument(str));
