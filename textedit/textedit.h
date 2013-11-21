@@ -60,8 +60,8 @@ QT_FORWARD_DECLARE_CLASS(QMenu)
 #define cout qDebug()
 #define MIN(a,b) a<b?a:b
 #define LINEHEIGHT 18
-#define LINECNT    45
-#define PAGEWIDTH  770
+#define LINECNT    29
+#define PAGEWIDTH  590
 //#define PAGEHEIGHT 825
 
 class TextEdit : public QMainWindow
