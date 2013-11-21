@@ -47,117 +47,122 @@
 #include <QPointer>
 #include <QPainter>
 #include <QTextDocument>
+#include <QTextEdit>
 #include "blank.h"
 #include "mycanvas.h"
-  QT_FORWARD_DECLARE_CLASS(QPainter)
-  QT_FORWARD_DECLARE_CLASS(QAction)
-  QT_FORWARD_DECLARE_CLASS(QComboBox)
-  QT_FORWARD_DECLARE_CLASS(QFontComboBox)
-  QT_FORWARD_DECLARE_CLASS(QTextEdit)
-  QT_FORWARD_DECLARE_CLASS(QTextCharFormat)
+QT_FORWARD_DECLARE_CLASS(QPainter)
+QT_FORWARD_DECLARE_CLASS(QAction)
+QT_FORWARD_DECLARE_CLASS(QComboBox)
+QT_FORWARD_DECLARE_CLASS(QFontComboBox)
+QT_FORWARD_DECLARE_CLASS(QTextEdit)
+QT_FORWARD_DECLARE_CLASS(QTextCharFormat)
 QT_FORWARD_DECLARE_CLASS(QMenu)
+#define cout qDebug()
 
-  class TextEdit : public QMainWindow
+class TextEdit : public QMainWindow
 {
   Q_OBJECT
 
-  public:
-    TextEdit(QWidget *parent = 0);
+public:
+  TextEdit(QWidget *parent = 0);
 
-  protected:
-    virtual void closeEvent(QCloseEvent *e);
-    void mouseMoveEvent(QMouseEvent *e){
-      qDebug()<<"TextEdit.mouseMoveEvent";
-      emit mouseMoveSig(e);
-    }
-    // void mouseMoveEvent(QMouseEvent* e){
-    // qDebug()<<"TextEdit.mouseMoveEvent";
-    // textBold();
-    // }
-    void mouseReleaseEvent(QMouseEvent*e){
-      qDebug()<<"TextEdit.mouseReleaseEvent";
-      textBold();
-    }
+protected:
+  virtual void closeEvent(QCloseEvent *e);
+  void mouseMoveEvent(QMouseEvent *e){
+    qDebug()<<"TextEdit.mouseMoveEvent";
+    emit mouseMoveSig(e);
+  }
+  // void mouseMoveEvent(QMouseEvent* e){
+  // qDebug()<<"TextEdit.mouseMoveEvent";
+  // textBold();
+  // }
+  void mouseReleaseEvent(QMouseEvent*e){
+    qDebug()<<"TextEdit.mouseReleaseEvent";
+    textBold();
+  }
 signals:
-    void mouseMoveSig(QMouseEvent *e);
-    void mousePressSig(QMouseEvent *e);
-    void mouseReleaseSig(QMouseEvent *e);
-  private:
+  void mouseMoveSig(QMouseEvent *e);
+  void mousePressSig(QMouseEvent *e);
+  void mouseReleaseSig(QMouseEvent *e);
+private:
 
-    void setupFileActions();
-    void setupEditActions();
-    void setupTextActions();
-    bool load(const QString &f);
-    bool maybeSave();
-    void setCurrentFileName(const QString &fileName);
+  void setupFileActions();
+  void setupEditActions();
+  void setupTextActions();
+  bool load(const QString &f);
+  bool maybeSave();
+  void setCurrentFileName(const QString &fileName);
 
-    private slots:
-      void onMouseMove(QMouseEvent*e){
-        qDebug()<<"TextEdit.onMouseMove";
-        //emit mouseMoveEvent(e);
-        //emit cursorPositionChanged();
-      }
-    void pageChanged(QString);
-    void iniFontSize();
-    void dividePages();
-    void fileNew();
-    void fileOpen();
-    bool fileSave();
-    bool fileSaveAs();
-    void filePrint();
-    void filePrintPreview();
-    void filePrintPdf();
+private slots:
+  void onMouseMove(QMouseEvent*e){
+    qDebug()<<"TextEdit.onMouseMove";
+    QString s=textEdit->anchorAt(e->pos());
+    cout<<s;
+    //emit mouseMoveEvent(e);
+    //emit cursorPositionChanged();
+  }
+  void pageChanged(QString);
+  void iniFontSize();
+  void dividePages();
+  void fileNew();
+  void fileOpen();
+  bool fileSave();
+  bool fileSaveAs();
+  void filePrint();
+  void filePrintPreview();
+  void filePrintPdf();
 
-    void textBold();
-    void textUnderline();
-    void textItalic();
-    void textFamily(const QString &f);
-    void textSize(const QString &p);
-    void textStyle(int styleIndex);
-    void textColor();
-    void textAlign(QAction *a);
+  void textBold();
+  void textUnderline();
+  void textItalic();
+  void textFamily(const QString &f);
+  void textSize(const QString &p);
+  void textStyle(int styleIndex);
+  void textColor();
+  void textAlign(QAction *a);
 
-    void currentCharFormatChanged(const QTextCharFormat &format);
-    void cursorPositionChanged();
+  void currentCharFormatChanged(const QTextCharFormat &format);
+  void cursorPositionChanged();
 
-    void clipboardDataChanged();
-    void about();
-    void printPreview(QPrinter *);
+  void clipboardDataChanged();
+  void about();
+  void printPreview(QPrinter *);
 
-  private:
-    void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
-    void fontChanged(const QFont &f);
-    void colorChanged(const QColor &c);
-    void alignmentChanged(Qt::Alignment a);
+private:
+  void mergeFormatOnWordOrSelection(const QTextCharFormat &format);
+  void fontChanged(const QFont &f);
+  void colorChanged(const QColor &c);
+  void alignmentChanged(Qt::Alignment a);
 
-    QAction *actionSave,
-            *actionTextBold,
-            *actionTextDump,
-            *actionTextUnderline,
-            *actionTextItalic,
-            *actionTextColor,
-            *actionAlignLeft,
-            *actionAlignCenter,
-            *actionAlignRight,
-            *actionAlignJustify,
-            *actionUndo,
-            *actionRedo,
-            *actionCut,
-            *actionCopy,
-            *actionPaste;
+  QAction *actionSave,
+  *actionTextBold,
+  *actionTextDump,
+  *actionTextUnderline,
+  *actionTextItalic,
+  *actionTextColor,
+  *actionAlignLeft,
+  *actionAlignCenter,
+  *actionAlignRight,
+  *actionAlignJustify,
+  *actionUndo,
+  *actionRedo,
+  *actionCut,
+  *actionCopy,
+  *actionPaste;
 
-    QComboBox *comboStyle;
-    QFontComboBox *comboFont;
-    QComboBox *comboPn;
-    QComboBox *comboSize;
+  QComboBox *comboStyle;
+  QFontComboBox *comboFont;
+  QComboBox *comboPn;
+  QComboBox *comboSize;
 
-    QToolBar *tb;
-    QString fileName;
-    QTextEdit *textEdit;
-    QVector<QTextDocument*> docs;
-    //Blank *blank;
-    //QPainter *paint;
-    MyCanvas *image;
+  QToolBar *tb;
+  QString fileName;
+  QTextEdit *textEdit;
+  QVector<QTextDocument*> docs;//store the pages of this doc
+  QVector<QLine> lines;//store the marks of this doc
+  //Blank *blank;
+  //QPainter *paint;
+  MyCanvas *image;
 };
 
 #endif

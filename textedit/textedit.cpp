@@ -42,7 +42,7 @@ void TextEdit::pageChanged(QString s){
 //init font size
 void TextEdit::iniFontSize(){
   //the document contains 50 lines
-  qDebug()<<"textedit.inifontsize";
+  cout<<"#textedit::inifontsize";
   QString s="12";
   qreal pointSize = s.toFloat();
   QTextCharFormat fmt;
@@ -61,9 +61,9 @@ void TextEdit::iniFontSize(){
   cursor.select(QTextCursor::Document);
   cursor.mergeCharFormat(fmt);
   //  QTextBlock block=cursor.block();
-  //  qDebug()<<"TextEdit.initFontSize:the block start and length:";
-  //  qDebug()<<block.position()<<","<<block.length();
-  //  qDebug()<<"TextEdit.initFontSize:the block text:"<<block.text();
+  //  cout<<"TextEdit.initFontSize:the block start and length:";
+  //  cout<<block.position()<<","<<block.length();
+  //  cout<<"TextEdit.initFontSize:the block text:"<<block.text();
   //cursor.setPosition(0);
 }
 //divide to pages
@@ -81,16 +81,17 @@ void TextEdit::dividePages(){
   int lastLine=-1;
   int pageLn=0;
   while(lineNum<doc->lineCount()){
-    qDebug()<<"";
-    qDebug()<<"block "<<blockNum<<"\tposx:"<<block.layout()->position().x()<<"\tposy:"<<block.layout()->position().y();
-    qDebug()<<block.text();
+    cout<<"";
+    cout<<"block "<<blockNum<<"\tposx:"<<block.layout()->position().x()<<"\tposy:"<<block.layout()->position().y();
+    cout<<block.text();
     int blockLength=block.text().length();
     int blockRemains=blockLength;
     int pos=0;
-#define LINEHEIGHT 18
+#define LINEHEIGHT 17
 #define LINELENGTH 50
 #define LINECNT    50
-#define PAGEHEIGHT 795
+#define PAGEWIDTH  770
+//#define PAGEHEIGHT 825
 #define MIN(a,b) a<b?a:b
     while(pageLn+(blockRemains/LINELENGTH+1)>=LINECNT){
       int length=MIN(blockRemains,(LINECNT-pageLn)*LINECNT);
@@ -100,12 +101,12 @@ void TextEdit::dividePages(){
       blockRemains-=length;
       pageLn=0;
       str="";
-      qDebug()<<"##############NEW PAGE#############";
+      cout<<"##############NEW PAGE#############";
     }
     str.append(block.text().mid(pos,blockRemains)+"\n");
     pageLn+=blockRemains/LINELENGTH+1;
 //    QRectF rect=block.layout()->boundingRect();
-//    qDebug()<<rect.height();
+//    cout<<rect.height();
 //    if(height>=700){
 //        docs.append(new QTextDocument(str));
 //        str="";
@@ -122,13 +123,13 @@ void TextEdit::dividePages(){
 ////      if(lineNum>0&&lineNum%40==0){
 //////      if(height>700){
 ////        docs.append(new QTextDocument(str));
-////        qDebug()<<"##############NEW PAGE#############";
+////        cout<<"##############NEW PAGE#############";
 ////        height=0;
 ////        str="";
 ////      }
 //      int s=line.textStart(),t=line.textLength();
-//      qDebug()<<"line "<<line.lineNumber()<<"\theight:"<<line.height()<<"\twidth:"<<line.width();//<<":"<<str.section(' ',s,s+t);
-//      qDebug()<<"line "<<line.lineNumber()<<"\tstart:"<<s<<"\tlength:"<<t;//<<":"<<str.section(' ',s,s+ QVectort);
+//      cout<<"line "<<line.lineNumber()<<"\theight:"<<line.height()<<"\twidth:"<<line.width();//<<":"<<str.section(' ',s,s+t);
+//      cout<<"line "<<line.lineNumber()<<"\tstart:"<<s<<"\tlength:"<<t;//<<":"<<str.section(' ',s,s+ QVectort);
 //      lineNum++;
 //    }
     block=block.next();
@@ -182,15 +183,15 @@ TextEdit::TextEdit(QWidget *parent)
   scrollArea->setBackgroundRole(QPalette::Light);   //scrollArea对象的背景色设为Dark
   //scrollArea->setBackgroundColor(QColor::white);
 
-  //  QStackedLayout *stackedLayout = new QStackedLayout;
-  //  stackedLayout->addWidget(textEdit);
-  //  stackedLayout->addWidget(image);
-  //  stackedLayout->setStackingMode(QStackedLayout::StackAll);
+//    QStackedLayout *stackedLayout = new QStackedLayout;
+//    stackedLayout->addWidget(image);
+//    stackedLayout->addWidget(textEdit);
+//    stackedLayout->setStackingMode(QStackedLayout::StackAll);
 
   QHBoxLayout* hLayout=new QHBoxLayout();
   hLayout->addWidget(textEdit);
   hLayout->addWidget(image);
-  //scrollArea->setLayout(stackedLayout);
+//  scrollArea->setLayout(stackedLayout);
   scrollArea->setLayout(hLayout);
   //scrollArea->setGeometry(QRect(50,50,800,800));
 
@@ -199,7 +200,7 @@ TextEdit::TextEdit(QWidget *parent)
   setCentralWidget(scrollArea);    //将scrollArea加入到主窗口的中心区new QPainter(this);
   scrollArea->setAlignment(Qt::AlignHCenter);
   //after canvas handle the mouse-drag event, emit it to the edittext for farther handling
-  //connect(image,SIGNAL(mouseMoveSig(QMouseEvent*)),this,SLOT(onMouseMove(QMouseEvent*)));
+  connect(image,SIGNAL(mouseMoveSig(QMouseEvent*)),this,SLOT(onMouseMove(QMouseEvent*)));
   //connect(image,SIGNAL(mouseMoveSig(QMouseEvent*)),textEdit,SLOT(mouseMoveEvent(QMouseEvent*)));
   //connect(image,SIGNAL(mouseMoveSig(QMouseEvent*)),textEdit,SLOT(cursorPositionChanged(QMouseEvent*)));
   //connect(this,SIGNAL(mouseMoveSig(QMouseEvent*)),image,SLOT(mouseMoveSlot(QMouseEvent*)));
@@ -243,8 +244,8 @@ TextEdit::TextEdit(QWidget *parent)
   connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(clipboardDataChanged()));
 #endif
 
-  //QString initialFile = ":/example.html";
-  QString initialFile = ":/test.txt";
+  //QString initialFile = ":/data/example.html";
+  QString initialFile = ":/data/test.txt";
   const QStringList args = QCoreApplication::arguments();
   if (args.count() == 2)
     initialFile = args.at(1);
@@ -527,9 +528,9 @@ void TextEdit::setupTextActions()
 
 bool TextEdit::load(const QString &f)
 {
-  qDebug()<<"textedit.load:"<<f;
+  cout<<"textedit.load:"<<f;
   if (!QFile::exists(f)){
-    qDebug()<<"textedit.load:not exists"<<f;
+    cout<<"textedit.load:not exists"<<f;
     return false;
   }
   QFile file(f);
@@ -540,13 +541,14 @@ bool TextEdit::load(const QString &f)
   QTextCodec *codec = Qt::codecForHtml(data);
   QString str = codec->toUnicode(data);
   if (Qt::mightBeRichText(str)) {
-    qDebug()<<"textedit.load:";
+    cout<<"textedit.load:";
     textEdit->setHtml(str);
   } else {
     str = QString::fromLocal8Bit(data);
     textEdit->setPlainText(str);
   }
   setCurrentFileName(f);
+  docs.clear();
   return true;
 }
 
@@ -596,7 +598,7 @@ void TextEdit::fileOpen()
 {
   QString fn = QFileDialog::getOpenFileName(this, tr("Open File..."),
                                             QString(), tr("HTML-Files (*.htm *.html);;All Files (*)"));
-  qDebug()<<"TextEdit.fileOPen:"<<fn;
+  cout<<"TextEdit.fileOPen:"<<fn;
   if (!fn.isEmpty())
     load(fn);
 }
@@ -710,7 +712,7 @@ void TextEdit::textSize(const QString &p)
 {
   qreal pointSize = p.toFloat();
   if (p.toFloat() > 0) {
-    qDebug()<<"textedit.textsize:"<<p;
+    cout<<"textedit.textsize:"<<p;
     QTextCharFormat fmt;
     fmt.setFontPointSize(pointSize);
     mergeFormatOnWordOrSelection(fmt);
@@ -808,6 +810,17 @@ void TextEdit::currentCharFormatChanged(const QTextCharFormat &format)
   colorChanged(format.foreground().color());
 }
 
+//int getBlockStart(QTextBlock &block){
+//  int index=block.blockNumber();
+//  const QTextDocument* doc=block.document();
+//  int num=0;
+//  QTextBlock t=doc->begin();
+//  for(int i=0;i<index;i++){
+//    num+=t.length();
+//    t=t.next();
+//  }
+//  return num;
+//}
 void TextEdit::cursorPositionChanged()
 {
   //alignmentChanged(textEdit->alignment());
@@ -815,18 +828,46 @@ void TextEdit::cursorPositionChanged()
   QTextCharFormat fmt;
   fmt.setForeground(col);
   QTextCursor cursor = textEdit->textCursor();
-  qDebug()<<"TextEdit.cursorPositionChanged:"<<cursor.selectionStart()<<","<<cursor.selectionEnd();
+  cout<<"#TextEdit::cursorPositionChanged:";
+  cout<<"cursor.selectionStart:"<<cursor.selectionStart()<<","<<cursor.selectionEnd();
+  int selectionStart=cursor.selectionStart(),
+      selectionEnd=cursor.selectionEnd();
   cursor.mergeCharFormat(fmt);
   colorChanged(col);
-  if(!cursor.hasSelection()) return;
-  QTextLayout* layout=cursor.block().layout();
-  QTextLine line = layout->lineAt(0);
-  //int x0,x1;
-  QPoint x0=(layout->position()).toPoint();
-  QPoint x1(x0.x()+line.width(),x0.y()+line.height());
-  image->paintLine(x0,x1);
-}
 
+  if(!cursor.hasSelection()) return;
+  QTextBlock block=cursor.block();
+  QTextLayout* layout=cursor.block().layout();
+  QRectF rect=layout->boundingRect();
+  cout<<"block:"<<rect.left()<<","<<rect.right()<<":"<<rect.top()<<","<<rect.bottom();
+  int blockStart=block.position();
+  cout<<"blockstart:"<<blockStart;
+
+  QPoint blockPoint=(layout->position()).toPoint();
+  int x=blockPoint.x()+(float)((selectionStart-blockStart)%LINELENGTH)/LINELENGTH*PAGEWIDTH;
+  int y=blockPoint.y()+((selectionStart-blockStart)/LINELENGTH+1)*LINEHEIGHT;
+  int x1=blockPoint.x()+(float)((selectionEnd-blockStart)%LINELENGTH)/LINELENGTH*PAGEWIDTH;
+  cout<<"block position:"<<blockPoint.x()<<","<<blockPoint.y();
+  cout<<"selection position:"<<x<<","<<y<<":"<<x1<<","<<y;
+//  int y1=blockPoint.y()+((cursor.selectionEnd()-blockStart)/LINELENGTH+1)*15;
+  QPoint selectionPoint(x,y);
+  QPoint selectionEndPoint(x1,y);
+  image->paintLine(selectionPoint,selectionEndPoint);
+
+  int lineStart=blockStart,lineEnd;
+  for(int i=0;i<block.lineCount();i++){
+  QTextLine line = layout->lineAt(i);
+  qreal lineWidth=line.width(),lineHeight=line.height();
+  lineEnd=lineStart+line.textLength();
+  int a=line.textStart(),b=line.textLength()+a;
+  cout<<"line.cursorToX:"<<line.cursorToX(selectionStart)<<","<<line.cursorToX(selectionEnd);
+  cout<<"line.textstart:"<<a<<","<<b;
+  cout<<"line.width:"<<lineWidth<<" height:"<<lineHeight;
+  rect=line.naturalTextRect();
+  cout<<"line.naturaltextrect:"<<rect.left()<<":"<<rect.top()<<":"<<rect.right()<<":"<<rect.bottom();
+  lineStart=lineEnd;
+  }
+}
 void TextEdit::clipboardDataChanged()
 {
 #ifndef QT_NO_CLIPBOARD
@@ -846,7 +887,7 @@ void TextEdit::mergeFormatOnWordOrSelection(const QTextCharFormat &format)
   QTextCursor cursor = textEdit->textCursor();
   if (!cursor.hasSelection())
     cursor.select(QTextCursor::WordUnderCursor);
-  qDebug()<<"TextEdit.mergeFormat..:"<<cursor.selectionStart()<<","<<cursor.selectionEnd();
+  cout<<"TextEdit.mergeFormat..:"<<cursor.selectionStart()<<","<<cursor.selectionEnd();
   cursor.mergeCharFormat(format);
   textEdit->mergeCurrentCharFormat(format);
 }
